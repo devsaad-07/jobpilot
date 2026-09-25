@@ -1,0 +1,213 @@
+# jobpilot main config. Every threshold here is read at runtime; no code change needed to tune.
+
+# Rollout mode — mirrors staged canary:
+#   shadow : discover, triage, fill, verify, capture proofs. NEVER clicks submit.
+#   canary : as live, but auto-submit capped at `canary_daily_auto_submits` total per day.
+#   live   : tiered auto-submit per `autosubmit` rules; everything else goes to review.
+mode: shadow
+canary_daily_auto_submits: 3
+
+paths:
+  data_dir: ./data              # sqlite db, logs
+  proofs_dir: ./proofs          # one folder per application
+  resumes_dir: ./resumes
+  browser_profile: ./data/chrome-profile   # dedicated Chrome profile; log in to portals once with `jobpilot login`
+
+browser:
+  channel: chrome               # use installed Google Chrome (more human fingerprint than bundled Chromium)
+  headless: false               # portals flag headless; keep false on the Mac
+  slow_mo_ms: 40
+  record_har: true
+  nav_timeout_ms: 45000
+
+# ---------- Discovery ----------
+discovery:
+  max_posting_age_days: 21      # older postings are usually stale / ghost roles
+  search_terms:
+    - "senior software engineer"
+    - "senior backend engineer"
+    - "SDE 3"
+    - "backend engineer golang"
+    - "platform engineer"
+    - "lead engineer backend"
+    - "full stack engineer senior"
+  india_locations: [Bengaluru, Bangalore, Hyderabad, Pune, Mumbai, Gurugram, Gurgaon, Noida, Delhi, Chennai, India]
+  jobspy:                       # LinkedIn / Naukri discovery via python-jobspy (add indeed/glassdoor if you want them)
+    enabled: true
+    sites: [linkedin, naukri]
+    results_per_term: 40
+    hours_old: 168
+    country_indeed: India
+  browser_portals:              # Instahyre / Cutshort / Wellfound / Hirist / Weekday via your logged-in profile
+    enabled: true
+    portals: [instahyre, cutshort, wellfound, hirist, weekday]
+  ats:
+    enabled: true               # Greenhouse/Lever/Ashby/Workable boards from config/companies.yaml
+  workday:                      # *.myworkdayjobs.com sites listed as `workday:` in companies.yaml
+    enabled: true
+    max_pages_per_term: 3       # 20 jobs/page (Workday's hard limit)
+    search_terms: ["software engineer", "backend engineer", "platform engineer", "lead engineer"]
+  wwr:                          # We Work Remotely public RSS (remote only; India eligibility checked in triage)
+    enabled: true
+    feeds:
+      - https://weworkremotely.com/categories/remote-back-end-programming-jobs.rss
+      - https://weworkremotely.com/categories/remote-full-stack-programming-jobs.rss
+      - https://weworkremotely.com/categories/remote-devops-sysadmin-jobs.rss
+  remote_boards:                # public APIs, no login. Their terms: keep the link back + source name (jobpilot does);
+    enabled: true               # Remotive: max 4 calls/day (enforced), data 24h delayed; Himalayas: 20/request, 429 on excess
+    sources: [remoteok, remotive, himalayas]
+    himalayas_terms: ["backend engineer", "software engineer", "golang", "platform engineer"]
+    himalayas_pages: 2          # 20 jobs/page; searched with country=IN & seniority=Senior
+
+# ---------- Fit validation ----------
+fit:
+  title_allow:                  # regexes, case-insensitive; at least one must match
+    - '\bsenior\b.*\b(software|backend|back[- ]end|platform|full[- ]?stack)\b.*\bengineer'
+    - '\b(software|backend|back[- ]end|platform|full[- ]?stack)\b.*\bengineer\b'
+    - '\bsde[- ]?(3|iii)\b'
+    - '\bsoftware development engineer[- ]?(3|iii)\b'
+    - '\blead\b.*\b(software|backend|platform)?\s*engineer'
+    - '\bmember of technical staff\b'
+  title_deny:                   # any match rejects
+    - '\b(intern|internship|trainee|fresher|junior|jr\.?|graduate|new grad)\b'
+    - '\b(sde|software development engineer|engineer)[- ]?(1|i)\b(?!i)'
+    - '(?<!technical )\b(staff|principal|distinguished|director|vp|head of|manager|architect)\b'
+    - '\b(front[- ]?end|ui|ios|android|mobile|flutter|react native)\s+(engineer|developer)\b'
+    - '\b(qa|sdet|test|automation test|support|devops|sre|site reliability|data|ml|machine learning|ai research|embedded|firmware|hardware)\s+(engineer|developer|scientist)\b'
+    - '\b(data scientist|salesforce|sap|servicenow|\.net|php|dynamics 365|mainframe)\b'
+    - '\b(in test|sdet|qa|quality)\b'                                   # "Software Engineer in Test"
+    - '^(?!.*\b(platform|infra(structure)?|backend|back[- ]end)\b).*\b(machine learning|ml|nlp|computer vision|deep learning|llm research)\b'
+    - '\b(information systems|systems? software|erp|workday hcm|business systems)\b'
+  experience:
+    my_years: 5
+    max_min_required: 6         # accept if the JD's *minimum* ≤ 6 ("5+", "4-8", "6+")
+    min_max_required: 5         # reject if the JD's *maximum* < 5 ("1-3", "2-4") — too junior
+    unknown_policy: review      # review | accept | reject
+  salary:
+    min_lpa: 60
+    usd_to_inr: 84              # used for USD-listed remote roles
+    unknown_policy: company_band   # company_band -> use companies.yaml band; missing band -> review
+    unknown_min_fit: null       # e.g. 0.70: no posted salary AND no band AND fit below this -> reject (off: apply anyway)
+  location:
+    allow_india_onsite: true
+    allow_india_hybrid: true
+    allow_remote_india_eligible: true
+    remote_employment_ok: [india_entity, eor, contractor]
+    reject_if_relocation_required: true
+  min_fit_score: 0.55           # 0..1 from Laya score (or keyword fallback)
+  allow_staffing_agencies: true
+
+exclusions:
+  companies: [CoinSwitch, Lemonn, ImageKit, Clearfeed, Sahi, Alpaca, Neosapiens]
+  domains: [coinswitch.co, lemonn.co.in, imagekit.io, clearfeed.ai, sahi.com, alpaca.markets, neosapiens.com]
+  company_cooldown_days: 90     # skip a company applied to within N days
+  cooldown_allow_different_team: false  # true = allow if team/department differs (needs review)
+
+# ---------- Dedup & ranking ----------
+dedup:
+  title_similarity: 0.88        # rapidfuzz token_set_ratio/100 on canonical titles within same company
+  recency_bucket_hours: 72      # postings within this window of each other are "equally recent" → portal rank decides
+  max_applications_per_company_per_run: 1
+portal_rank:                    # lower = preferred (recruiter signal). Direct ATS first.
+  greenhouse: 1
+  lever: 1
+  ashby: 1
+  workable: 1
+  company_site: 1
+  workday: 1                    # a company's own Workday site is a direct apply
+  linkedin: 2
+  weworkremotely: 2.5           # WWR links out to the company's own form, so it's near-direct
+  himalayas: 2.6                # remote aggregators: all link out to the company's own form
+  remotive: 2.7
+  remoteok: 2.8
+  instahyre: 3
+  naukri: 4
+  wellfound: 5
+  cutshort: 6
+  weekday: 6.5                  # applications go through Weekday's recruiters, an intermediary
+  hirist: 7
+
+# ---------- Submission policy ----------
+caps_per_day:                   # hard caps on submits per source per IST day
+  greenhouse: 50
+  lever: 50
+  ashby: 50
+  workable: 50
+  company_site: 50
+  workday: 15                   # account/sign-in per company; always reviewed
+  weworkremotely: 20
+  himalayas: 20
+  remotive: 20
+  remoteok: 20
+  linkedin: 20
+  naukri: 20
+  instahyre: 15
+  cutshort: 15
+  wellfound: 15
+  hirist: 15
+  weekday: 15
+pacing:
+  min_gap_s: 45
+  max_gap_s: 180
+  active_hours_ist: [9, 21]     # never submit outside these IST hours
+autosubmit:                     # tiered: ALL must hold, otherwise → review queue
+  sources: [greenhouse, lever, ashby, workable]
+  min_fit_score: 0.70
+  require_salary_known_or_banded: true
+  # Unknowns you accept for auto-submit (canary/live). Shadow mode fills these jobs either way.
+  allow_unknown_experience: true      # JD states no years and Laya couldn't tell -> still eligible
+  allow_unknown_salary: true          # no posted salary and no company band -> still eligible
+  require_verified_band: false        # true = unverified company-band estimates go to review
+  allow_llm_freetext_answers: false   # any generated free-text answer forces review
+  max_llm_answers: 0                  # count of non-deterministic answers tolerated
+kill_switch_file: ./STOP        # create this file to halt any running submit loop immediately
+
+# ---------- Models ----------
+llm:
+  laya:
+    enabled: true
+    model: aac6fef/laya-typed-decisions-mlx   # 1,024-token context; use aac6fef/laya-mlx (512) if you prefer
+    dtype: float16
+  codex:
+    enabled: true
+    binary: codex
+    timeout_s: 180
+    extra_args: ["--sandbox", "read-only", "--skip-git-repo-check", "--ephemeral"]
+  # Antigravity (agy) is for developing/debugging this repo, not a runtime dependency.
+
+# ---------- Confirmation emails ----------
+email:
+  enabled: true
+  imap_host: imap.gmail.com
+  imap_user_env: JOBPILOT_IMAP_USER        # set in .env
+  imap_password_env: JOBPILOT_IMAP_APP_PASSWORD   # Gmail app password, not your login password
+  lookback_days: 10
+  match_window_hours: 72
+
+# ---------- Outreach (assisted: jobpilot finds people + drafts; YOU press Send on LinkedIn) ----------
+outreach:
+  enabled: true
+  linkedin:
+    plan: premium                  # premium | free
+    premium_until: FILL_ME         # trial end date, YYYY-MM-DD; after it, free-tier limits apply automatically
+    note_chars_premium: 300
+    note_chars_free: 200
+    free_notes_per_month: 5        # free accounts get ~5 personalised notes/month; beyond that invites go blank
+    note_target_chars: [120, 180]  # shorter notes get accepted more often
+  limits:
+    invites_per_day: 15
+    invites_per_week: 80
+    messages_per_day: 20
+    emails_per_day: 15
+    contacts_per_company: 2
+    recontact_after_days: 60
+    followup_after_days: 6         # one follow-up, then stop
+    withdraw_pending_after_days: 21
+    pause_if_acceptance_below: 0.30   # after at least `acceptance_min_sample` invites
+    acceptance_min_sample: 20
+  persona_priority: [connection, hiring_team, eng_manager, founder, engineer, recruiter]
+  hiring_team_pages_per_day: 20    # LinkedIn job pages opened only to read "Meet the hiring team"
+  referral_hold:
+    enabled: true
+    days: 7
+    min_band_lpa: 60               # only hold where pay (posted or company band) tops ≥ this

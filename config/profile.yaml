@@ -1,0 +1,75 @@
+# Single source of truth for every form answer. The filler only uses values from here,
+# answers.yaml, or the resume text. Anything else is an LLM answer and is flagged for review.
+# Fill every FILL_ME before switching mode away from shadow — the verifier blocks any
+# application that would send a FILL_ME value.
+
+identity:
+  first_name: FILL_ME
+  last_name: FILL_ME
+  full_name: FILL_ME
+  email: FILL_ME            # the address recruiters should reply to
+  phone: FILL_ME            # e.g. "+91 98XXXXXXXX"
+  phone_national: FILL_ME   # 10 digits, no country code
+  phone_country_code: "+91"
+  linkedin: FILL_ME         # e.g. https://linkedin.com/in/<you>
+  github: FILL_ME            # e.g. https://github.com/<you>; leave "" to skip optional fields
+  portfolio: ""
+  current_city: Bengaluru
+  current_country: India
+  willing_to_relocate_within_india: true
+  preferred_locations: [Bengaluru, Remote]
+
+work:
+  current_company: FILL_ME
+  current_title: FILL_ME
+  total_experience_years: 5          # Oct 2021 → present
+  relevant_experience_years: 5
+  go_experience_years: 4
+  notice_period_days: FILL_ME        # e.g. 60
+  serving_notice: false
+  last_working_day: ""               # set if serving notice
+  current_ctc_lpa: FILL_ME           # keep identical everywhere; recruiters compare portals
+  expected_ctc_lpa: FILL_ME          # e.g. 65; the verifier checks every CTC field equals this
+  ctc_negotiable: true
+  open_to_contract: true
+
+education:
+  degree: B.Tech
+  field: Computer Science and Engineering
+  institution: FILL_ME
+  graduation_year: 2021
+  start_year: 2017
+
+authorization:
+  work_authorized_india: true
+  requires_sponsorship_india: false
+  work_authorized_us: false
+  requires_sponsorship_us: true
+  work_authorized_eu_uk: false
+  remote_from_india_ok: true
+  employment_types_ok: [full_time, contract, eor]
+
+eeo:                                  # voluntary self-ID questions default to decline
+  gender: Decline to self-identify
+  race: Decline to self-identify
+  veteran: I am not a protected veteran
+  disability: I do not want to answer
+
+skills:
+  primary: [Go, Distributed Systems, Microservices, NATS JetStream, PostgreSQL, Redis, Kubernetes, AWS]
+  languages: [Go, TypeScript, Node.js, Java, C++, Python, SQL]
+  domains: [options market making, order management systems, broker connectivity, payments, messaging infrastructure, observability]
+
+outreach:
+  # View-only share links (e.g. Google Drive "Anyone with the link") — sent in messages after someone
+  # accepts, never in the connection note itself.
+  resume_links:
+    general: FILL_ME
+    trading: FILL_ME
+    platform: FILL_ME
+  signature: FILL_ME       # e.g. "Your Name · linkedin.com/in/<you>"
+
+consent:
+  agree_privacy_policy: true
+  agree_data_retention: true
+  marketing_opt_in: false

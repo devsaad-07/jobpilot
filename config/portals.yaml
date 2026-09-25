@@ -1,0 +1,182 @@
+# Portal adapters driven by config, so a portal UI change is a YAML edit, not a code change.
+# Selectors/texts are starting points — run `jobpilot doctor --portal <name>` in shadow mode
+# once after logging in and adjust anything it reports as not found.
+#
+#   search_urls      : {q} = url-encoded search term
+#   job_link_pattern : regex; anchors whose href matches are job detail pages
+#   apply_texts      : visible button/link text that starts an application (first match wins)
+#   external_texts   : text meaning "apply on company site" → we follow the link and route to the ATS applier
+#   modal            : CSS for the application dialog/drawer (form fields are looked up inside it)
+#   next_texts       : buttons to advance multi-step flows
+#   submit_texts     : final submit buttons (only clicked when policy allows)
+#   success_patterns : regex on page text after submit
+#   logged_in_check  : CSS present only when logged in (one of several signals, see jobpilot/portal_auth.py)
+#   session_cookies  : cookie names that exist only while logged in (most reliable signal)
+#   `jobpilot doctor --portals --debug` prints each portal's URL + cookie names and saves a screenshot,
+#   which is what you need to fill these in when a portal changes.
+
+portals:
+  linkedin:
+    home: https://www.linkedin.com/feed/
+    logged_in_check: 'img.global-nav__me-photo, .global-nav__me, [data-control-name="nav.settings"], img[alt*="Photo of"]'
+    session_cookies: [li_at]        # LinkedIn's auth cookie
+    apply_texts: ['Easy Apply']
+    external_texts: ['Apply']
+    modal: '.jobs-easy-apply-modal, [data-test-modal][role=dialog]'
+    next_texts: ['Next', 'Review', 'Continue to next step', 'Review your application']
+    submit_texts: ['Submit application']
+    success_patterns: ['application was sent', 'Your application was sent', 'Applied \d+ (second|minute)s? ago']
+    unfollow_company_checkbox: 'label[for="follow-company-checkbox"]'
+
+  naukri:
+    home: https://www.naukri.com/mnjuser/homepage
+    logged_in_check: '.nI-gNb-drawer__icon, .nI-gNb-header__wrapper .user-name'
+    apply_texts: ['Apply']
+    external_texts: ['Apply on company site']
+    modal: '.chatbot_DrawerContentWrapper, .chatbot_Drawer'
+    chat_input: '.chatbot_DrawerContentWrapper [contenteditable="true"], .chatbot_DrawerContentWrapper input'
+    chat_send: '.chatbot_DrawerContentWrapper .sendMsg, .chatbot_DrawerContentWrapper button[type=submit]'
+    next_texts: []
+    submit_texts: ['Save', 'Submit']
+    success_patterns: ['successfully applied', 'Applied', 'You have successfully applied']
+
+  instahyre:
+    home: https://www.instahyre.com/candidate/opportunities/
+    search_urls: ['https://www.instahyre.com/search-jobs/?q={q}&loc=Bangalore']
+    job_link_pattern: 'instahyre\.com/job-\d+'
+    logged_in_check: 'a[href*="logout"], .candidate-profile, #candidate-header'
+    apply_texts: ['Apply', 'Interested']
+    external_texts: []
+    modal: '.modal.show, .modal-dialog, [role=dialog]'
+    next_texts: ['Next', 'Continue']
+    submit_texts: ['Apply', 'Submit']
+    success_patterns: ['applied', 'application (has been )?(sent|submitted)']
+
+  cutshort:
+    home: https://cutshort.io/profile
+    search_urls: ['https://cutshort.io/jobs?q={q}&locations=Bangalore']
+    job_link_pattern: 'cutshort\.io/job/'
+    logged_in_check: '[data-testid="avatar"], a[href*="/profile"]'
+    apply_texts: ['Apply', 'Apply now']
+    external_texts: []
+    modal: '[role=dialog], .ReactModal__Content'
+    next_texts: ['Next', 'Continue']
+    submit_texts: ['Apply', 'Submit application', 'Submit']
+    success_patterns: ['applied', 'application (was )?(sent|submitted)']
+
+  wellfound:
+    home: https://wellfound.com/jobs
+    search_urls: ['https://wellfound.com/role/l/software-engineer/bangalore', 'https://wellfound.com/role/r/backend-engineer']
+    job_link_pattern: 'wellfound\.com/jobs/\d+'
+    logged_in_check: 'a[href*="/profile"], [data-test="Avatar"]'
+    apply_texts: ['Apply']
+    external_texts: ['Apply on company website']
+    modal: '[role=dialog], .ReactModal__Content'
+    next_texts: []
+    submit_texts: ['Send application', 'Apply', 'Submit']
+    success_patterns: ['application (sent|submitted)', 'applied']
+
+  hirist:
+    home: https://www.hirist.tech/
+    search_urls: ['https://www.hirist.tech/search/{q}?loc=bangalore']
+    job_link_pattern: 'hirist\.tech/j/'
+    logged_in_check: '.user-profile, a[href*="logout"]'
+    apply_texts: ['Apply', 'Apply Now']
+    external_texts: []
+    modal: '[role=dialog], .modal'
+    next_texts: ['Next']
+    submit_texts: ['Apply', 'Submit']
+    success_patterns: ['applied', 'successfully']
+
+  weekday:
+    # Weekday (weekday.works) is an AI-sourcing/recruiter platform: "1-click apply" sends your
+    # Weekday profile to their recruiters, who then pitch you to the company.
+    home: https://jobs.weekday.works/
+    search_urls: ['https://www.weekday.works/jobs/backend-jobs-in-india-remote', 'https://jobs.weekday.works/?search={q}']
+    job_link_pattern: 'jobs\.weekday\.works/(?!sign|login|salary|compan|search|blog|resume|\?)[a-z0-9][^/?#]*-[^/?#]+$'
+    logged_in_check: '[class*="avatar" i], a[href*="profile"], a[href*="logout"]'
+    apply_texts: ['1-click apply', 'Apply', 'Apply now', 'Easy Apply']
+    external_texts: ['Apply on company website', 'Apply on company site']
+    modal: '[role=dialog], .MuiDialog-root, .modal'
+    next_texts: ['Next', 'Continue']
+    submit_texts: ['Submit', 'Apply', 'Confirm']
+    success_patterns: ['applied', 'application (sent|submitted)', 'we.ll (reach out|get back)']
+
+  weworkremotely:
+    # No hosted forms: "Apply for this position" opens the company's own page/ATS (external route).
+    home: https://weworkremotely.com/
+    logged_in_check: ''            # no login needed
+    apply_texts: []
+    external_texts: ['Apply for this position', 'Apply now', 'Apply']
+    success_patterns: []
+
+  # Remote aggregators: no hosted forms, the apply button links to the company's page/ATS.
+  remoteok:
+    home: https://remoteok.com/
+    logged_in_check: ''
+    apply_texts: []
+    external_texts: ['Apply for this job', 'Apply now', 'Apply']
+    success_patterns: []
+  remotive:
+    home: https://remotive.com/
+    logged_in_check: ''
+    apply_texts: []
+    external_texts: ['Apply for this position', 'Apply now', 'Apply']
+    success_patterns: []
+  himalayas:
+    home: https://himalayas.app/
+    logged_in_check: ''
+    apply_texts: []
+    external_texts: ['Apply now', 'Apply on company website', 'Apply for this job', 'Apply']
+    success_patterns: []
+
+  workday:
+    # Every company has its own Workday tenant and candidate account (email + password per company).
+    # jobpilot never stores Workday passwords: the first time per company it stops for you to sign in
+    # or create the account (`jobpilot apply --id N --interactive`); the dedicated Chrome profile keeps
+    # the session afterwards.
+    apply_selector: '[data-automation-id="adventureButton"], a[data-automation-id="adventureButton"]'
+    apply_texts: ['Apply', 'Apply Now']
+    # "Autofill with Resume" lets Workday parse the resume into My Experience (work history / education
+    # sections); jobpilot then fills and verifies the rest. Always review-only.
+    start_texts: ['Autofill with Resume', 'Apply Manually', 'Use My Last Application']
+    start_selectors: ['[data-automation-id="autofillWithResume"]', '[data-automation-id="applyManually"]', '[data-automation-id="useMyLastApplication"]']
+    signin_markers: ['input[type=password]', '[data-automation-id="signInContent"]', '[data-automation-id="createAccountPage"]', '[data-automation-id="signInLink"]']
+    next_selector: '[data-automation-id="pageFooterNextButton"], [data-automation-id="bottom-navigation-next-button"]'
+    next_texts: ['Save and Continue', 'Next', 'Continue']
+    review_marker: '[data-automation-id="applyFlowReviewPage"], [data-automation-id="reviewJobApplicationPage"]'
+    submit_texts: ['Submit']
+    success_patterns: ['congratulations', 'application (has been )?submitted', 'thank(s| you) for applying', 'successfully submitted']
+
+# ATS hosted forms (no login). Used both for direct ATS jobs and for "apply on company site"
+# links found on LinkedIn/Naukri/Wellfound.
+ats:
+  greenhouse:
+    host_patterns: ['greenhouse\.io', 'boards\.greenhouse', 'job-boards\.greenhouse']
+    apply_texts: ['Apply', 'Apply for this job', 'Apply Now']
+    submit_texts: ['Submit application', 'Submit Application', 'Submit']
+    success_patterns: ['thank you for applying', 'application (has been )?(received|submitted)', 'we.ve received your application']
+  lever:
+    host_patterns: ['jobs\.lever\.co']
+    url_suffix: /apply
+    submit_texts: ['Submit application', 'Submit']
+    success_patterns: ['application submitted', 'thank you for (your application|applying)', 'we.ve received your application']
+  ashby:
+    host_patterns: ['jobs\.ashbyhq\.com']
+    url_suffix: /application
+    submit_texts: ['Submit Application', 'Submit']
+    success_patterns: ['thank you for (your application|applying)', 'application (was )?(submitted|received)']
+  workday:
+    host_patterns: ['myworkdayjobs\.com']
+    submit_texts: ['Submit']
+    success_patterns: ['congratulations', 'application (has been )?submitted', 'thank(s| you) for applying']
+  workable:
+    host_patterns: ['apply\.workable\.com']
+    url_suffix: /apply/
+    submit_texts: ['Submit application', 'Submit']
+    success_patterns: ['thank you', 'application (was )?(submitted|received|sent)']
+  generic:
+    host_patterns: ['.*']
+    apply_texts: ['Apply', 'Apply now', 'Apply for this job', 'Apply for this position']
+    submit_texts: ['Submit application', 'Submit Application', 'Submit', 'Apply']
+    success_patterns: ['thank you', 'application (has been |was )?(received|submitted|sent)', 'successfully applied']

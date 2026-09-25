@@ -1,0 +1,62 @@
+# Deterministic answer bank. First matching rule wins (top to bottom).
+#   match   : regex on the normalised field label (+ name/placeholder), case-insensitive
+#   value   : literal, or {dotted.path} into profile.yaml, or {resume_file}
+#   kind    : optional hint (text|number|yesno|select|file) — used by the verifier
+# Anything unmatched falls through to Codex (answer + provenance) and is flagged.
+
+rules:
+  # --- identity ---
+  - {match: '^(legal )?first name|given name', value: '{identity.first_name}'}
+  - {match: '^(legal )?last name|surname|family name', value: '{identity.last_name}'}
+  - {match: '^(full |legal )?name$|^your name|^candidate name', value: '{identity.full_name}'}
+  - {match: 'e-?mail', value: '{identity.email}'}
+  - {match: 'country phone code|phone code|country code', value: ['+91', 'India (+91)', 'India'], kind: select}
+  - {match: 'phone device type|phone type', value: ['Mobile', 'Mobile Phone', 'Cell'], kind: select}
+  - {match: 'phone|mobile|contact number', value: '{identity.phone}'}
+  - {match: 'linkedin', value: '{identity.linkedin}'}
+  - {match: 'github', value: '{identity.github}'}
+  - {match: 'portfolio|website|personal site|blog', value: '{identity.portfolio}'}
+  - {match: 'resume|cv\b|curriculum', value: '{resume_file}', kind: file}
+  - {match: 'cover letter', value: '', kind: file}
+
+  # --- location / authorization ---
+  - {match: 'current (city|location)|where are you (currently )?(based|located)|^location\b|city of residence', value: '{identity.current_city}'}
+  - {match: '^country$|country of residence|^country/territory', value: '{identity.current_country}', kind: select}
+  - {match: 'require.*sponsor|need.*sponsor|visa sponsorship', value: 'No', kind: yesno}
+  - {match: 'authori[sz]ed to work|legally (eligible|permitted) to work|right to work', value: 'Yes', kind: yesno}
+  - {match: 'willing to relocate|open to relocat', value: 'Yes', kind: yesno}
+  - {match: 'work (from|in) (the )?office|hybrid|onsite|on-site', value: 'Yes', kind: yesno}
+  - {match: 'contract(or)? basis|open to contract|independent contractor', value: 'Yes', kind: yesno}
+
+  # --- work ---
+  - {match: 'current (company|employer|organi[sz]ation)|present employer|^company$', value: '{work.current_company}'}
+  - {match: 'current (title|designation|role|position)|job title', value: '{work.current_title}'}
+  - {match: 'years.*go(lang)?\b|go(lang)? experience', value: '{work.go_experience_years}', kind: number}
+  # only the *total* experience question; "years with Kafka?" etc. go to Codex, which answers from the resume
+  - {match: '^(total|overall) (work |professional |relevant )?(experience|exp)|^(how many )?years of (total |professional |work |industry |relevant )?experience( do you have)?\??( \(years\))?$|^experience( in years| \(years\))?$', value: '{work.total_experience_years}', kind: number}
+  - {match: 'notice period|how soon can you join|earliest start|joining time', value: '{work.notice_period_days}', kind: number}
+  - {match: 'current (ctc|salary|compensation|package)|present (ctc|salary)', value: '{work.current_ctc_lpa}', kind: number}
+  - {match: 'expected (ctc|salary|compensation|package)|salary expectation|desired (salary|compensation)', value: '{work.expected_ctc_lpa}', kind: number}
+  - {match: 'serving notice', value: 'No', kind: yesno}
+
+  # --- education ---
+  - {match: 'degree|qualification', value: '{education.degree}'}
+  - {match: 'discipline|field of study|major|specialisation|specialization', value: '{education.field}'}
+  - {match: 'school|university|college|institut', value: '{education.institution}'}
+  - {match: 'graduation year|year of (graduation|passing)', value: '{education.graduation_year}', kind: number}
+
+  # --- EEO / voluntary ---
+  - {match: '\bgender\b|\bsex\b', value: '{eeo.gender}', kind: select}
+  - {match: 'race|ethnicity|hispanic', value: '{eeo.race}', kind: select}
+  - {match: 'veteran', value: '{eeo.veteran}', kind: select}
+  - {match: 'disabilit', value: '{eeo.disability}', kind: select}
+
+  # --- consent ---
+  - {match: 'privacy (policy|notice)|consent|i (agree|acknowledge)|data (processing|retention)', value: 'Yes', kind: yesno}
+  - {match: 'marketing|newsletter|future (job )?opportunit.*email', value: 'No', kind: yesno}
+
+  # --- sourcing ---
+  - {match: 'referred by|referrer.?s? name|name of (the )?(employee|referr)|who referred you', value: '{referrer}'}
+  - {match: 'were you referred|referred by an? (current )?employee|employee referral\?', value: '{referred_yesno}', kind: yesno}
+  - {match: 'how did you (hear|find|learn)|source of application', value: ['Company careers page', 'Company Website', 'Careers Page', 'Career Site', 'Website', 'Job Board', 'LinkedIn', 'Other'], kind: select}
+  - {match: 'previously (worked|employed|applied)|former employee', value: 'No', kind: yesno}

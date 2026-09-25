@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:media="http://search.yahoo.com/mrss/">
+<channel><title>We Work Remotely: Back-End Programming Jobs</title>
+<item>
+  <title>Acme Payments: Senior Backend Engineer (Go)</title>
+  <region>Anywhere in the World</region><country></country><state></state>
+  <skills>Go, PostgreSQL, Kafka</skills><category>Back-End Programming</category><type>Full-Time</type>
+  <description>&lt;p&gt;We need 5+ years of backend experience in Go and distributed systems.&lt;/p&gt;&lt;ul&gt;&lt;li&gt;Kafka&lt;/li&gt;&lt;/ul&gt;</description>
+  <pubDate>Tue, 22 Sep 2026 10:15:00 +0000</pubDate><expires_at>2026-10-22</expires_at>
+  <guid>https://weworkremotely.com/remote-jobs/acme-payments-senior-backend-engineer-go</guid>
+  <link>https://weworkremotely.com/remote-jobs/acme-payments-senior-backend-engineer-go</link>
+</item>
+<item>
+  <title>Beta Corp: Staff Engineer</title>
+  <region>USA Only</region><country>United States</country>
+  <type>Full-Time</type><description>US only.</description>
+  <pubDate>Mon, 21 Sep 2026 08:00:00 +0000</pubDate>
+  <link>https://weworkremotely.com/remote-jobs/beta-corp-staff-engineer</link>
+</item>
+</channel></rss>

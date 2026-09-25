@@ -1,0 +1,97 @@
+# Company registry: aliases (for dedup), ATS board slugs (for discovery), comp band (for the
+# ≥60 LPA gate when a posting has no salary).
+#
+# band_lpa = [low, high] total yearly comp (fixed + variable + annualised stock) for an
+# SDE-3 / Senior SWE in India, in lakhs. THE SEEDED NUMBERS ARE ROUGH ESTIMATES, NOT RESEARCH —
+# check each against Levels.fyi / AmbitionBox / people you know and edit. `band_verified: true`
+# marks the ones you've checked; the report lists unverified bands that drove an apply decision.
+#
+# ats: auto → `jobpilot probe-ats` tries each slug on Greenhouse, Lever, Ashby, Workable and
+# records the one that answers in data/ats_resolved.json. Pin with e.g. `ats: greenhouse`.
+#
+# workday: <careers URL> → the company's *.myworkdayjobs.com site. Open the company's careers page,
+# click through to the job search, and paste the URL up to the site name, e.g.
+#   https://nvidia.wd5.myworkdayjobs.com/NVIDIAExternalCareerSite
+# `probe-ats` checks each one answers. The seeded URLs below are ones I believe are right but
+# couldn't verify from my sandbox — probe-ats will flag any that are wrong.
+
+defaults:
+  band_verified: false
+
+companies:
+  # --- global tech with India engineering ---
+  - {name: Stripe, slugs: [stripe], ats: auto, band_lpa: [80, 140]}
+  - {name: Databricks, slugs: [databricks], ats: auto, band_lpa: [80, 140]}
+  - {name: Coinbase, slugs: [coinbase], ats: auto, band_lpa: [80, 140]}
+  - {name: Rubrik, slugs: [rubrik], ats: auto, band_lpa: [65, 110]}
+  - {name: Confluent, slugs: [confluent], ats: auto, band_lpa: [65, 110]}
+  - {name: Airbnb, slugs: [airbnb], ats: auto, band_lpa: [80, 140]}
+  - {name: Snowflake, slugs: [snowflake, snowflakecomputing], ats: auto, band_lpa: [70, 120]}
+  - {name: Cloudflare, slugs: [cloudflare], ats: auto, band_lpa: [60, 100]}
+  - {name: Datadog, slugs: [datadog], ats: auto, band_lpa: [60, 100]}
+  - {name: MongoDB, slugs: [mongodb], ats: auto, band_lpa: [60, 95]}
+  - {name: Twilio, slugs: [twilio], ats: auto, band_lpa: [55, 90]}
+  - {name: Okta, slugs: [okta], ats: auto, band_lpa: [55, 90]}
+  - {name: Samsara, slugs: [samsara], ats: auto, band_lpa: [65, 110]}
+  - {name: Rippling, slugs: [rippling], ats: auto, band_lpa: [65, 110]}
+  - {name: Nutanix, slugs: [nutanix], ats: auto, band_lpa: [50, 85]}
+  - {name: Cohesity, slugs: [cohesity], ats: auto, band_lpa: [55, 90]}
+  - {name: ThoughtSpot, slugs: [thoughtspot], ats: auto, band_lpa: [50, 85]}
+  - {name: Harness, slugs: [harness, harnessinc], ats: auto, band_lpa: [55, 90]}
+  - {name: Clari, slugs: [clari], ats: auto, band_lpa: [50, 80]}
+  - {name: Tekion, slugs: [tekion], ats: auto, band_lpa: [50, 80]}
+  - {name: Observe.AI, aliases: [ObserveAI], slugs: [observeai], ats: auto, band_lpa: [45, 75]}
+
+  # --- remote-first (India-eligible via entity/EOR/contract) ---
+  - {name: GitLab, slugs: [gitlab], ats: auto, band_lpa: [55, 90]}
+  - {name: Grafana Labs, aliases: [Grafana], slugs: [grafanalabs], ats: auto, band_lpa: [55, 90]}
+  - {name: Deel, slugs: [deel], ats: auto, band_lpa: [45, 80]}
+  - {name: PostHog, slugs: [posthog], ats: auto, band_lpa: [60, 110]}
+  - {name: Sentry, slugs: [sentry, getsentry], ats: auto, band_lpa: [60, 100]}
+  - {name: Supabase, slugs: [supabase], ats: auto, band_lpa: [55, 100]}
+  - {name: Temporal Technologies, aliases: [Temporal], slugs: [temporal, temporaltechnologies], ats: auto, band_lpa: [65, 110]}
+  - {name: Redpanda Data, aliases: [Redpanda], slugs: [redpanda, redpandadata], ats: auto, band_lpa: [60, 100]}
+  - {name: ClickHouse, slugs: [clickhouse], ats: auto, band_lpa: [60, 100]}
+  - {name: Hasura, slugs: [hasura], ats: auto, band_lpa: [45, 75]}
+
+  # --- trading / crypto / fintech infra (trading resume) ---
+  - {name: Tower Research Capital, aliases: [Tower Research], slugs: [towerresearchcapital], ats: auto, band_lpa: [80, 150]}
+  - {name: Kraken, slugs: [kraken, krakendigitalassetexchange], ats: auto, band_lpa: [60, 110]}
+  - {name: Fireblocks, slugs: [fireblocks], ats: auto, band_lpa: [60, 100]}
+  - {name: Chainalysis, slugs: [chainalysis], ats: auto, band_lpa: [55, 95]}
+  - {name: Ripple, slugs: [ripple], ats: auto, band_lpa: [65, 110]}
+  - {name: Plaid, slugs: [plaid], ats: auto, band_lpa: [70, 120]}
+  - {name: Robinhood, slugs: [robinhood], ats: auto, band_lpa: [70, 120]}
+  - {name: Gemini, slugs: [gemini], ats: auto, band_lpa: [60, 100]}
+
+  # --- Indian product companies ---
+  - {name: CRED, slugs: [cred, dreamplug], ats: auto, band_lpa: [55, 90]}
+  - {name: Razorpay, slugs: [razorpay, razorpaysoftwareprivatelimited], ats: auto, band_lpa: [50, 85]}
+  - {name: Groww, slugs: [groww, nextbillion], ats: auto, band_lpa: [50, 85]}
+  - {name: PhonePe, slugs: [phonepe], ats: auto, band_lpa: [50, 85]}
+  - {name: Meesho, slugs: [meesho], ats: auto, band_lpa: [50, 85]}
+  - {name: Zepto, slugs: [zepto, kiranakart], ats: auto, band_lpa: [50, 90]}
+  - {name: Dream11, aliases: [Dream Sports, DreamSports], slugs: [dreamsports, dream11], ats: auto, band_lpa: [50, 85]}
+  - {name: Postman, slugs: [postman], ats: auto, band_lpa: [55, 90]}
+  - {name: BrowserStack, slugs: [browserstack], ats: auto, band_lpa: [50, 85]}
+  - {name: Juspay, slugs: [juspay], ats: auto, band_lpa: [40, 70]}
+  - {name: Zeta, slugs: [zeta, zetasuite], ats: auto, band_lpa: [45, 75]}
+  - {name: Glance, aliases: [InMobi, Glance InMobi], slugs: [glance, inmobi], ats: auto, band_lpa: [50, 85]}
+  - {name: Sprinklr, slugs: [sprinklr], ats: auto, band_lpa: [45, 75]}
+  - {name: Chargebee, slugs: [chargebee], ats: auto, band_lpa: [40, 70]}
+  # --- Workday sites (India engineering centres) ---
+  - {name: NVIDIA, slugs: [], ats: none, workday: https://nvidia.wd5.myworkdayjobs.com/NVIDIAExternalCareerSite, band_lpa: [70, 130]}
+  - {name: Salesforce, slugs: [], ats: none, workday: https://salesforce.wd12.myworkdayjobs.com/External_Career_Site, band_lpa: [60, 100]}
+  - {name: Adobe, slugs: [], ats: none, workday: https://adobe.wd5.myworkdayjobs.com/external_experienced, band_lpa: [55, 95]}
+  - {name: Walmart Global Tech, aliases: [Walmart], slugs: [], ats: none, workday: https://walmart.wd5.myworkdayjobs.com/WalmartExternal, band_lpa: [50, 85]}
+  - {name: PayPal, slugs: [], ats: none, workday: https://paypal.wd1.myworkdayjobs.com/jobs, band_lpa: [50, 85]}
+  - {name: Mastercard, slugs: [], ats: none, workday: https://mastercard.wd1.myworkdayjobs.com/CorporateCareers, band_lpa: [45, 75]}
+  - {name: Workday, slugs: [], ats: none, workday: https://workday.wd5.myworkdayjobs.com/Workday, band_lpa: [55, 90]}
+  - {name: Autodesk, slugs: [], ats: none, workday: https://autodesk.wd1.myworkdayjobs.com/Ext, band_lpa: [50, 85]}
+  - {name: Target, slugs: [], ats: none, workday: https://target.wd5.myworkdayjobs.com/targetcareers, band_lpa: [40, 70]}
+  - {name: Morgan Stanley, slugs: [], ats: none, workday: https://ms.wd5.myworkdayjobs.com/External, band_lpa: [45, 80]}
+
+  - {name: Uber, slugs: [], ats: none, band_lpa: [70, 120]}         # own careers site; discovered via LinkedIn/Naukri
+  - {name: Atlassian, slugs: [], ats: none, band_lpa: [70, 120]}
+  - {name: Flipkart, slugs: [], ats: none, band_lpa: [50, 85]}
+  - {name: Swiggy, slugs: [], ats: none, band_lpa: [50, 80]}

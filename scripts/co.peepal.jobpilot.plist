@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- Install:  sed "s#__ROOT__#$PWD#g" scripts/co.peepal.jobpilot.plist > ~/Library/LaunchAgents/co.peepal.jobpilot.plist
+               launchctl load ~/Library/LaunchAgents/co.peepal.jobpilot.plist
+     Runs at 10:30, 14:30 and 18:30 local time (IST) while you're logged in (the browser needs your session). -->
+<plist version="1.0"><dict>
+  <key>Label</key><string>co.peepal.jobpilot</string>
+  <key>ProgramArguments</key><array><string>/bin/bash</string><string>__ROOT__/scripts/run.sh</string></array>
+  <key>StartCalendarInterval</key><array>
+    <dict><key>Hour</key><integer>10</integer><key>Minute</key><integer>30</integer></dict>
+    <dict><key>Hour</key><integer>14</integer><key>Minute</key><integer>30</integer></dict>
+    <dict><key>Hour</key><integer>18</integer><key>Minute</key><integer>30</integer></dict>
+  </array>
+  <key>StandardErrorPath</key><string>__ROOT__/data/logs/launchd.err</string>
+  <key>StandardOutPath</key><string>__ROOT__/data/logs/launchd.out</string>
+</dict></plist>

@@ -1,0 +1,69 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Senior Software Engineer - Workday</title>
+<style>.hide{display:none} [role=listbox]{border:1px solid #999;padding:4px} li[role=option]{cursor:pointer;padding:2px}</style></head>
+<body>
+<div id="job"><h2>Senior Software Engineer, Payments</h2><p>Bengaluru, India. 5+ years of experience in Go.</p>
+  <a href="#" data-automation-id="adventureButton" role="button" onclick="show('choose');return false;">Apply</a></div>
+
+<div id="choose" class="hide" role="dialog">
+  <a href="#" data-automation-id="autofillWithResume" role="button" onclick="show(SIGNIN ? 'signin' : 's1');return false;">Autofill with Resume</a>
+  <a href="#" data-automation-id="applyManually" role="button" onclick="show('s1');return false;">Apply Manually</a>
+</div>
+
+<div id="signin" class="hide" data-automation-id="signInContent">
+  <label for="em">Email Address</label><input id="em" type="email">
+  <label for="pw">Password</label><input id="pw" type="password">
+  <button>Sign In</button>
+</div>
+
+<div id="s1" class="hide"><h3>My Information</h3>
+  <label for="fn">First Name*</label><input id="fn" data-automation-id="legalNameSection_firstName" required>
+  <label for="ln">Last Name*</label><input id="ln" data-automation-id="legalNameSection_lastName" required>
+  <label id="ctl">Country*</label>
+  <button aria-haspopup="listbox" aria-labelledby="ctl" id="ctry" onclick="openList(this,['Germany','India','United States'])">Select One</button>
+  <label id="pdl">Phone Device Type*</label>
+  <button aria-haspopup="listbox" aria-labelledby="pdl" id="pdt" onclick="openList(this,['Home','Mobile','Work'])">Select One</button>
+  <label id="ccl">Country Phone Code*</label>
+  <button aria-haspopup="listbox" aria-labelledby="ccl" id="cpc" onclick="openList(this,['Germany (+49)','India (+91)','United States of America (+1)'])">Select One</button>
+  <label for="ph">Phone Number*</label><input id="ph" type="tel" required>
+  <label id="hdl">How Did You Hear About Us?*</label>
+  <button aria-haspopup="listbox" aria-labelledby="hdl" id="hd" onclick="openList(this,['Employee Referral','Job Board','Company Website','Social Media'])">Select One</button>
+  <button data-automation-id="pageFooterNextButton" onclick="show('s2')">Save and Continue</button>
+</div>
+
+<div id="s2" class="hide"><h3>My Experience</h3>
+  <div data-automation-id="workExperience-1">
+    <label for="jt">Job Title*</label><input id="jt" value="Software Development Engineer II" required>
+    <label for="co">Company*</label><input id="co" value="CoinSwitch" required>
+  </div>
+  <div data-automation-id="education-1">
+    <label for="sch">School or University*</label><input id="sch" value="Test Institute of Technology" required>
+  </div>
+  <label for="res">Resume/CV*</label>
+  <input id="res" type="file" data-automation-id="file-upload-input-ref" onchange="document.getElementById('rn').innerText=this.files[0].name">
+  <span id="rn">Dev_Saad_Senior_Software_Engineer.pdf</span>
+  <button data-automation-id="pageFooterNextButton" onclick="show('s3')">Save and Continue</button>
+</div>
+
+<div id="s3" class="hide"><h3>Application Questions</h3>
+  <fieldset><legend>Will you now or in the future require sponsorship for employment visa status?*</legend>
+    <label><input type="radio" name="spon" value="y">Yes</label><label><input type="radio" name="spon" value="n">No</label></fieldset>
+  <label id="npl">What is your notice period?*</label>
+  <button aria-haspopup="listbox" aria-labelledby="npl" id="np" onclick="openList(this,['Immediate','30 days','60 days','90 days'])">Select One</button>
+  <button data-automation-id="pageFooterNextButton" onclick="show('s4')">Save and Continue</button>
+</div>
+
+<div id="s4" class="hide" data-automation-id="applyFlowReviewPage"><h3>Review</h3>
+  <button data-automation-id="pageFooterNextButton" onclick="document.body.innerHTML='<h2>Congratulations!</h2><p>Your application has been submitted.</p>'">Submit</button>
+</div>
+
+<script>
+const SIGNIN = location.hash === '#signin';
+function show(id){ for (const d of ['job','choose','signin','s1','s2','s3','s4']) document.getElementById(d).classList.toggle('hide', d !== id); }
+function openList(btn, opts){
+  document.querySelectorAll('[role=listbox]').forEach(x => x.remove());
+  const ul = document.createElement('ul'); ul.setAttribute('role','listbox');
+  for (const o of opts){ const li = document.createElement('li'); li.setAttribute('role','option'); li.innerText = o;
+    li.onclick = () => { btn.innerText = o; ul.remove(); }; ul.appendChild(li); }
+  btn.after(ul);
+}
+</script></body></html>

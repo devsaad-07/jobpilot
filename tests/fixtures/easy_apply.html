@@ -1,0 +1,21 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Job</title></head><body>
+<h1>Senior Software Engineer</h1>
+<div class="jobs-easy-apply-modal" role="dialog">
+  <div id="s1">
+    <label for="em">Email address</label><select id="em" name="em"><option>Select an option</option><option>test.user@example.com</option></select>
+    <label for="ph">Mobile phone number</label><input id="ph" name="ph" required>
+    <button type="button" aria-label="Continue to next step" onclick="go(2)">Next</button>
+  </div>
+  <div id="s2" style="display:none">
+    <label for="up">Upload resume</label><input id="up" type="file" name="up">
+    <label for="go">How many years of work experience do you have with Go?</label><input id="go" name="go" required>
+    <label for="yrs">How many years of experience do you have?</label><input id="yrs" name="yrs" required>
+    <button type="button" onclick="go(3)">Review</button>
+  </div>
+  <div id="s3" style="display:none">
+    <p>Review your application</p>
+    <button type="button" onclick="document.body.innerHTML='<p>Your application was sent to Acme</p>'">Submit application</button>
+  </div>
+</div>
+<script>function go(n){ for (const i of [1,2,3]) document.getElementById('s'+i).style.display = i===n ? '' : 'none'; }</script>
+</body></html>
